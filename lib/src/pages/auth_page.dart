@@ -6,9 +6,10 @@ class AuthPage extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
+    
     WidgetsBinding.instance!.addPostFrameCallback((_){
       _checkAuth(context);
-    });
+    });  
 
     return Center(
       child: CircularProgressIndicator(),

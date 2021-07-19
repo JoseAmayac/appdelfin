@@ -12,7 +12,7 @@ class User {
   String password;
 
   User({ required this.name, required this.email, required this.password  }){
-    this._connection = new Mysql().connection;
+    this._connection = Mysql().connection;
   }
 
   factory User.fromMap(Map<String, dynamic> data) => User(
@@ -22,36 +22,44 @@ class User {
   );
 
   Future<Map<String, dynamic>> login() async{
+    try {
+      final results = await _connection.query('''
+        select * from users where email = ? 
+      ''', [this.email.trim()]);
 
-    final results = await _connection.query('''
-      select * from users where email = ? 
-    ''', [this.email.trim()]);
+      if (results.length == 0) {
+        return {
+          "ok": false,
+          "message": "Correo electrónico o contraseña incorrectos"
+        };
+      }
+      Map<String, dynamic> data = {
+        "name": results.first[1],
+        "email": results.first[2],
+        "password": results.first[3]
+      };
+      final User user = User.fromMap(data);
+      user.id = results.first[0];
 
-    if (results.length == 0) {
+      if (!mathPasswords(user.password, this.password)) {
+        return {
+          "ok": false,
+          "message": "Correo electrónico o contraseña incorrectos"
+        };
+      }
+
+      return {
+        "ok": true,
+        "user": user
+      };
+    } catch (e) {
+      print(e);
       return {
         "ok": false,
-        "message": "Correo electrónico o contraseña incorrectos"
+        "message": "Error al iniciar sesión"
       };
     }
-    Map<String, dynamic> data = {
-      "name": results.first[1],
-      "email": results.first[2],
-      "password": results.first[3]
-    };
-    final User user = User.fromMap(data);
-    user.id = results.first[0];
-
-    if (!mathPasswords(user.password, this.password)) {
-      return {
-        "ok": false,
-        "message": "Correo electrónico o contraseña incorrectos"
-      };
-    }
-
-    return {
-      "ok": true,
-      "user": user
-    };
+    
   }
 
   Future<Map<String, dynamic>> register() async {
@@ -64,81 +72,120 @@ class User {
       };
     }
 
-    final result = await this._connection.query('''
-      INSERT INTO users(name, email, password) VALUES (?, ?,?)
-    ''',[this.name, this.email, this.password]);
+    try {
+      final result = await this._connection.query('''
+        INSERT INTO users(name, email, password) VALUES (?, ?,?)
+      ''',[this.name, this.email, this.password]);
 
-    this.id = result.insertId;
+      this.id = result.insertId;
 
-    return {
-      "ok": true,
-      "user": this
-    };
+      return {
+        "ok": true,
+        "user": this
+      };  
+    } catch (e) {
+      return {
+        "ok": false,
+        "message": "Error al registrarse"
+      };
+    }
+    
   }
 
   Future<bool> verifyEmailExists() async {
-    final results = await _connection.query('''
-      select * from users where email = ? 
-    ''', [this.email.trim()]);
+    try {
+      final results = await _connection.query('''
+        select * from users where email = ? 
+      ''', [this.email.trim()]);
 
-    if (results.length > 0) {
-      return true;
+      if (results.length > 0) {
+        return true;
+      }
+
+      return false;  
+    } catch (e) {
+      return false;
     }
-
-    return false;
+    
   }
 
   Future<List<User>> getUsers() async{
     List<User> users = [];
 
-    final results = await _connection.query('''
-      SELECT * FROM users
-    ''');
-    for (var fila in results) {
-      final user = User(name: fila[1], email: fila[2], password: fila[3]);
-      user.id = fila[0];
-      users.add(user);
-    }
+    try {
+      final results = await _connection.query('''
+        SELECT * FROM users
+      ''');
 
-    return users;
+      for (var fila in results) {
+        final user = User(name: fila[1], email: fila[2], password: fila[3]);
+        user.id = fila[0];
+        users.add(user);
+      }
+
+      return users;
+    } catch (e) {
+      return [];
+    }
   }
 
   Future getUser() async{
-    final results = await _connection.query('''
-      SELECT * FROM users WHERE id = ?
-    ''', [this.id]);
+    try {
+      final results = await _connection.query('''
+        SELECT * FROM users WHERE id = ?
+      ''', [this.id]);
 
-    Map<String, dynamic> data = {
-      "id": results.first[0],
-      "name": results.first[1],
-      "email": results.first[2],
-      "password": results.first[3]
-    };
-
-    return data;
-  }
-
-  Future<Map<String, dynamic>> getByEmail() async {
-    final result = await this._connection.query('''
-      SELECT * FROM users WHERE email = ?
-    ''',[this.email]);
-
-    if (result.length > 0) {
-      final user = result.first;
-      this.id = user[0];
-      this.name = user[1];
-      this.password = user[3];
+      Map<String, dynamic> data = {
+        "id": results.first[0],
+        "name": results.first[1],
+        "email": results.first[2],
+        "password": results.first[3]
+      };
 
       return {
         "ok": true,
-        "user": this,
-      };
-    }else{
+        ...data
+      };  
+    } catch (e) {
       return {
         "ok": false,
-        "message": "No existe un usuario con ese email"
+        "message": "Error consultando el usuario"
       };
     }
+    
+  }
+
+  Future<Map<String, dynamic>> getByEmail() async {
+    try {
+      final result = await this._connection.query('''
+        SELECT * FROM users WHERE email = ?
+      ''',[this.email]);
+
+      if (result.length > 0) {
+        final user = result.first;
+        this.id = user[0];
+        this.name = user[1];
+        this.password = user[3];
+
+        return {
+          "ok": true,
+          "user": this,
+        };
+      }else{
+        return {
+          "ok": false,
+          "message": "No existe un usuario con ese email",
+          "code": "404"
+        };
+      }  
+    } catch (e) {
+      return {
+        "ok": false,
+        "message": "Error consultando el usuario",
+        "code" :"500"
+      };
+    }
+    
   }
 
 }

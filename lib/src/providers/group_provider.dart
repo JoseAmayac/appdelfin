@@ -36,6 +36,7 @@ class GroupProvider with ChangeNotifier{
   Future getGroups() async{
     final idUser = this._prefs.user;
     final groupsUser = await this._groupService.allById(int.parse(idUser!));
+    print(groupsUser);
     this.groups = [...groupsUser];
     notifyListeners();
   }

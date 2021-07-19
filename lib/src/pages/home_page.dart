@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mensajeriadelfin/src/pages/no_connected_page.dart';
 import 'package:mensajeriadelfin/src/providers/check_connection_provider.dart';
 import 'package:mensajeriadelfin/src/providers/contact_provider.dart';
 import 'package:mensajeriadelfin/src/providers/group_provider.dart';
@@ -25,12 +26,16 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final connectionProvider = Provider.of<ConnectivityChangeNotifier>(context);
-    print(connectionProvider.connected);
-    return Scaffold(
-      appBar: _customAppBar(context),
-      body: _myBody(context),
-      key: UniqueKey(),
-    );
+    
+    if (connectionProvider.connected) {
+      return Scaffold(
+        appBar: _customAppBar(context),
+        body: _myBody(context),
+        key: UniqueKey(),
+      );
+    }else{
+      return NoConnectionPage();
+    }
   }
 
   PreferredSizeWidget _customAppBar(context){

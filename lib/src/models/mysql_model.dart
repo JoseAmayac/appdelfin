@@ -1,7 +1,5 @@
 import 'package:mysql1/mysql1.dart';
 
-
-
 class Mysql{
   static final Mysql _instance = Mysql._internal();
 

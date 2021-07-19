@@ -3,6 +3,7 @@ import 'package:mysql1/mysql1.dart';
 
 class Message {
   late MySqlConnection _connection;
+
   int? id;
   String body;
   int userId;
@@ -20,46 +21,58 @@ class Message {
   );
 
   Future<Map<String,dynamic>> save() async {
-    final result = await this._connection.query('''
+    try {
+      final result = await this._connection.query('''
 
-      INSERT INTO messages(body, user_id, group_id) VALUES(?, ?, ?)
+        INSERT INTO messages(body, user_id, group_id) VALUES(?, ?, ?)
 
-    ''',[this.body, this.userId, this.groupId]);
+      ''',[this.body, this.userId, this.groupId]);
 
-    final id= result.insertId;
+      final id= result.insertId;
 
-    final results = await this._connection.query('''
-      SELECT created_at FROM messages WHERE id = ?
-    ''', [id]);
+      final results = await this._connection.query('''
+        SELECT created_at FROM messages WHERE id = ?
+      ''', [id]);
 
-    this.id = id;
-    this.createdAt = results.first[0];
+      this.id = id;
+      this.createdAt = results.first[0];
 
-    return {
-      "ok": true,
-      "message": this
-    };
+      return {
+        "ok": true,
+        "message": this
+      };  
+    } catch (e) {
+      return {
+        "ok": false,
+        "message": "Error enviando el mensaje"
+      };
+    }
+    
   }
 
   Future<List<Map<String,dynamic>>> all() async {
     List<Map<String,dynamic>> messagesMap = [];
 
-    final results = await this._connection.query('''
-      SELECT * FROM messages WHERE group_id = ? ORDER BY created_at
-    ''', [this.groupId]);
+    try {
+      final results = await this._connection.query('''
+        SELECT * FROM messages WHERE group_id = ? ORDER BY created_at
+      ''', [this.groupId]);
 
-    print(results.length);
-    for (var message in results) {
-      messagesMap.add({
-        "id": message[0],
-        "userId": message[1],
-        "groupId": message[2],
-        "body": message[3].toString(),
-        "createdAt": message[4]
-      });
+      for (var message in results) {
+        messagesMap.add({
+          "id": message[0],
+          "userId": message[1],
+          "groupId": message[2],
+          "body": message[3].toString(),
+          "createdAt": message[4]
+        });
+      }
+
+      return messagesMap;  
+    } catch (e) {
+      return [];
     }
-
-    return messagesMap;
+    
   }
 
 }

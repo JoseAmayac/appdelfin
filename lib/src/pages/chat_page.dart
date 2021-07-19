@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:mensajeriadelfin/src/models/group_model.dart';
+import 'package:mensajeriadelfin/src/pages/no_connected_page.dart';
+import 'package:mensajeriadelfin/src/providers/check_connection_provider.dart';
 import 'package:mensajeriadelfin/src/providers/group_provider.dart';
 import 'package:mensajeriadelfin/src/providers/group_user_provider.dart';
 import 'package:mensajeriadelfin/src/providers/message_provider.dart';
@@ -24,12 +26,18 @@ class _ChatPageState extends State<ChatPage> {
   final formKey = GlobalKey<FormState>();
   @override
   Widget build(BuildContext context) {
+    final ConnectivityChangeNotifier connectionProvider = Provider.of<ConnectivityChangeNotifier>(context);
     this.group = ModalRoute.of(context)!.settings.arguments as Group;
-    return Scaffold(
-      appBar: _myAppbar(context),
-      body: _myBody(context),
-      bottomSheet: _form(context)
-    );
+
+    if(connectionProvider.connected){
+      return Scaffold(
+        appBar: _myAppbar(context),
+        body: _myBody(context),
+        bottomSheet: _form(context)
+      );
+    }else{
+      return NoConnectionPage();
+    }
   }
 
   PreferredSizeWidget _myAppbar(BuildContext context) {

@@ -45,7 +45,7 @@ class UserProvider with ChangeNotifier{
     notifyListeners();
   }
 
-  Future<User> getUser(int id) async{
+  Future<User?> getUser(int id) async{
     return await this._userService.getUser(id);
   }
 

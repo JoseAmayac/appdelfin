@@ -26,15 +26,20 @@ class UserService{
     return await user.getUsers();
   }
 
-  Future<User> getUser(int id) async{
+  Future<User?> getUser(int id) async{
     User user = User(name: '', email: '', password: '');
     user.id = id;
     final data = await user.getUser();
-    user.name = data['name'];
-    user.email = data['email'];
-    user.password = data['password'];
 
-    return user;
+    if (data["ok"]) {
+      user.name = data['name'];
+      user.email = data['email'];
+      user.password = data['password'];  
+
+      return user;
+    }else{
+      return null;
+    }
   }
 
   Future getUserByEmail(String email) async{

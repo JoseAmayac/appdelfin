@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:mensajeriadelfin/src/pages/login_page.dart';
+import 'package:mensajeriadelfin/src/pages/no_connected_page.dart';
+import 'package:mensajeriadelfin/src/providers/check_connection_provider.dart';
 import 'package:mensajeriadelfin/src/providers/user_provider.dart';
 import 'package:mensajeriadelfin/src/utils/alert.dart' as alert;
 import 'package:mensajeriadelfin/src/utils/validators.dart' as validators;
+import 'package:provider/provider.dart';
 
 class RegistroPage extends StatefulWidget {
 
@@ -25,14 +28,20 @@ class _RegistroPageState extends State<RegistroPage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _crearFondo(context),
-          _loginForm(context),
-        ],
-      ),
-    );
+    final ConnectivityChangeNotifier connectionProvider = Provider.of<ConnectivityChangeNotifier>(context);
+
+    if(connectionProvider.connected){
+      return Scaffold(
+        body: Stack(
+          children: [
+            _crearFondo(context),
+            _loginForm(context),
+          ],
+        ),
+      );
+    }else{
+      return NoConnectionPage();
+    }
   }
 
   Widget _crearFondo(BuildContext context) {

@@ -13,33 +13,44 @@ class Contact{
   }
 
   Future<Map<String, dynamic>> save() async{
-    final result = await this._connection.query('''
-      INSERT INTO contacts (user1_id, user2_id) VALUES(?, ?) ON DUPLICATE KEY UPDATE user1_id = ?, user2_id = ?
-    ''',[this.user1, this.user2, this.user1, this.user2]);
+    try {
+      final result = await this._connection.query('''
+        INSERT INTO contacts (user1_id, user2_id) VALUES(?, ?) ON DUPLICATE KEY UPDATE user1_id = ?, user2_id = ?
+      ''',[this.user1, this.user2, this.user1, this.user2]);
 
-    return {
-      "ok": true,
-      "result": result.insertId,
-    };
+      return {
+        "ok": true,
+        "result": result.insertId,
+      };
+    } catch (e) {
+      return {
+        "ok": false,
+        "message": "Error consultando los contactos"
+      };
+    }
   }
 
   Future<List<Map<String, dynamic>>> allById(int id) async{
     List<Map<String, dynamic>> contacts = [];
 
-    final results = await this._connection.query('''
-      SELECT id, name, email FROM users, contacts WHERE (users.id = contacts.user1_id OR users.id = contacts.user2_id) AND (contacts.user1_id = ? OR contacts.user2_id = ?) AND users.id <> ?;
-    ''', [id, id, id]);
+    try {
+      final results = await this._connection.query('''
+        SELECT id, name, email FROM users, contacts WHERE (users.id = contacts.user1_id OR users.id = contacts.user2_id) AND (contacts.user1_id = ? OR contacts.user2_id = ?) AND users.id <> ?;
+      ''', [id, id, id]);
 
-    for (var result in results) {
-      final userMap = {
-        "id": result[0],
-        "name": result[1],
-        "email": result[2]
-      };
-      contacts.add(userMap);
+      for (var result in results) {
+        final userMap = {
+          "id": result[0],
+          "name": result[1],
+          "email": result[2]
+        };
+        contacts.add(userMap);
+      }
+
+      return contacts;
+    } catch (e) {
+      return [];
     }
-
-    return contacts;
   }
 
 
