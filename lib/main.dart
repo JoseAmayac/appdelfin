@@ -7,6 +7,7 @@ import 'package:mensajeriadelfin/src/pages/chat_page.dart';
 import 'package:mensajeriadelfin/src/pages/home_page.dart';
 import 'package:mensajeriadelfin/src/pages/login_page.dart';
 import 'package:mensajeriadelfin/src/pages/new_conversation_page.dart';
+import 'package:mensajeriadelfin/src/pages/no_connected_page.dart';
 import 'package:mensajeriadelfin/src/pages/registro_page.dart';
 import 'package:mensajeriadelfin/src/providers/check_connection_provider.dart';
 import 'package:mensajeriadelfin/src/providers/contact_provider.dart';
@@ -24,18 +25,21 @@ Future<void> main() async {
 
 
   final mysql = new Mysql();
-  await mysql.connect();
+  final connected = await mysql.connect();
 
-  runApp(MyApp());
+  if (connected) {
+    runApp(MyApp());
+  }else{
+    runApp(MyAppNoConnection());
+  }
 } 
   
  
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Color(0xff121212)
-    ));
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(statusBarColor: Color(0xff121212)));
+
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => UserProvider() ),
@@ -61,9 +65,23 @@ class MyApp extends StatelessWidget {
           'register': ( _ ) => RegistroPage(),
           'home' : ( _ ) => HomePage(),
           'new-chat': ( _ ) => NewConversation(),
-          'messageschat': ( _ ) => ChatPage()
+          'messageschat': ( _ ) => ChatPage(),
+          'no-connected' : ( _ ) => NoConnectionPage()
         }
       ),
+    );
+  }
+}
+
+class MyAppNoConnection extends StatelessWidget {
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: NoConnectionPage(),
+      title: 'Mis mensajes',
+      debugShowCheckedModeBanner: false,
+      theme: temaP,
     );
   }
 }

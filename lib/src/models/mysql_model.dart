@@ -20,17 +20,24 @@ class Mysql{
 
   MySqlConnection get connection => _connection;
 
-  Future<void> connect() async{
+  Future<bool> connect() async{
     final settings = new ConnectionSettings(
       host: this._host,
       user: this._user,
       password: this._password,
       db: this._db,
-      port: this._port
+      port: this._port,
+      
     );
 
-    this._connection = await MySqlConnection.connect(settings);
-    await this._createTables();
+    try {
+      this._connection = await MySqlConnection.connect(settings);
+      await this._createTables();
+
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   Future _createTables() async{

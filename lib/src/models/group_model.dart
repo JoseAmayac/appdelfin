@@ -67,10 +67,9 @@ class Group{
         group.id = result[0];
         groups.add(group);
       }
-
       return groups;
     } catch (e) {
-      print("Error feo: $e");
+      print(e);
       return [];
     }
   }

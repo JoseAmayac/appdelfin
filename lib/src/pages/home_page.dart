@@ -26,25 +26,31 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final connectionProvider = Provider.of<ConnectivityChangeNotifier>(context);
-    
-    if (connectionProvider.connected) {
-      return Scaffold(
-        appBar: _customAppBar(context),
-        body: _myBody(context),
-        key: UniqueKey(),
-      );
-    }else{
-      return NoConnectionPage();
-    }
+
+    return Stack(
+      children: [
+        Scaffold(
+          appBar: _customAppBar(context),
+          body: _myBody(context),
+          key: UniqueKey(),
+        ),
+        !connectionProvider.connected ? NoConnectionPage() : Container(),
+      ],
+    );
   }
 
   PreferredSizeWidget _customAppBar(context){
+    final provider = Provider.of<GroupProvider>(context, listen: false);
     return AppBar(
       toolbarHeight: 65,
       // elevation: 48,
       backgroundColor: Color(0xff121212),
       title: Text('Conversaciones', style: TextStyle(fontSize: 25, color: Color(0xffBB86FC))),
       actions: [
+        IconButton(
+          onPressed: () => provider.getGroups(), 
+          icon: Icon(Icons.refresh)
+        ),
         Container(
           // padding: EdgeInsets.symmetric(vertical: 10),
           child: PopupMenuButton(
