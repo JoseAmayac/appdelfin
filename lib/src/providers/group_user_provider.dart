@@ -25,4 +25,12 @@ class GroupUserProvider{
     final userId = int.parse(this._prefs.user!);
     return await this._groupUserService.leaveChat(userId, groupId);
   }
+
+  Future findOne(int groupId, int userId) async{
+    return await this._groupUserService.findOne(groupId, userId);
+  }
+
+  Future createOne(int groupId, int userId) async{
+    return await this._groupUserService.save(groupId, userId);
+  }
 }

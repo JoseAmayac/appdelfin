@@ -34,6 +34,24 @@ class GroupUser{
     }
   }
 
+  Future<Map<String,dynamic>> findOne() async {
+    final results = await this._connection.query('''
+      SELECT * FROM group_user WHERE group_id = ? AND user_id = ?
+    ''', [this.groupId, this.userId]);
+
+    if (results.length > 0) {
+      return {
+        "ok": false,
+        "message": "Este usuario ya hace parte del grupo"
+      };
+    }else{
+      return {
+        "ok": true,
+        // "groupUser": results.first
+      };
+    }
+  }
+
   Future delete() async {
     try {
       final result = await this._connection.query('''

@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:mensajeriadelfin/src/pages/no_connected_page.dart';
-import 'package:mensajeriadelfin/src/providers/check_connection_provider.dart';
 import 'package:mensajeriadelfin/src/providers/contact_provider.dart';
 import 'package:provider/provider.dart';
 
@@ -22,30 +20,23 @@ class _NewConversationState extends State<NewConversation> {
 
   @override
   Widget build(BuildContext context) {
-    final ConnectivityChangeNotifier connectionProvider = Provider.of<ConnectivityChangeNotifier>(context);
-
-    if (connectionProvider.connected) {
-      return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Color(0xff121212),
-          centerTitle: true,
-          title: Text('Nueva conversasión'),
-        ),
-        body: SingleChildScrollView(
-          child: Container(
-            padding: EdgeInsets.all(20.0),
-            child: Column(
-              children: [
-                _formNew(context)
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Color(0xff121212),
+        centerTitle: true,
+        title: Text('Nueva conversasión'),
+      ),
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(20.0),
+          child: Column(
+            children: [
+              _formNew(context)
+            ],
           ),
-        )
-      );  
-    }else{
-      return NoConnectionPage();
-    }
-    
+        ),
+      )
+    );  
   }
 
   Widget _formNew(BuildContext context) {

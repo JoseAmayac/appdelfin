@@ -58,6 +58,7 @@ class Group{
     List<Group> groups = [];
 
     try {
+      
       final results = await this._connection.query('''
         SELECT groups.id as id, groups.name as name, groups.owner_id as owner FROM groups INNER JOIN group_user ON group_user.group_id=groups.id WHERE group_user.user_id = ?
       ''', [idUser]);

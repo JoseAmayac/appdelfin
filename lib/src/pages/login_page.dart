@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:mensajeriadelfin/src/pages/no_connected_page.dart';
 import 'package:mensajeriadelfin/src/pages/registro_page.dart';
-import 'package:mensajeriadelfin/src/providers/check_connection_provider.dart';
 import 'package:mensajeriadelfin/src/providers/user_provider.dart';
 import 'package:mensajeriadelfin/src/utils/alert.dart' as alert;
 import 'package:mensajeriadelfin/src/utils/validators.dart' as validators;
-import 'package:provider/provider.dart';
 
 class LoginPage extends StatefulWidget {
 
@@ -27,20 +24,14 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final ConnectivityChangeNotifier connectionProvider = Provider.of<ConnectivityChangeNotifier>(context);
-
-    if (connectionProvider.connected) {
-      return Scaffold(
-        body: Stack(
-          children: [
-            _crearFondo(context),
-            _loginForm(context),
-          ],
-        ),
-      );
-    }else{
-      return NoConnectionPage();
-    }
+    return Scaffold(
+      body: Stack(
+        children: [
+          _crearFondo(context),
+          _loginForm(context),
+        ],
+      ),
+    );
   }
 
   Widget _crearFondo(BuildContext context) {

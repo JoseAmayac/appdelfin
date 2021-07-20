@@ -12,4 +12,8 @@ class GroupUserService{
     return await groupUser.delete();
   }
   
+  Future findOne(int groupId, int userId) async{
+    final groupUser = new GroupUser(groupId: groupId, userId:userId);
+    return await groupUser.findOne();
+  }
 }

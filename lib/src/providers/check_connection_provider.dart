@@ -1,14 +1,13 @@
-import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:connectivity/connectivity.dart';
 
 class ConnectivityChangeNotifier extends ChangeNotifier {
-  late StreamSubscription sub;
+  
 
   ConnectivityChangeNotifier() {
-    sub = Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
+    Connectivity().onConnectivityChanged.listen((ConnectivityResult result) {
       resultHandler(result);
     });
   }
@@ -26,7 +25,8 @@ class ConnectivityChangeNotifier extends ChangeNotifier {
         if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
           _connected = true;
         }
-      } on SocketException catch (_) {
+      } on SocketException catch (e) {
+        print(e);
         _connected = false;
       }
     }
@@ -40,10 +40,4 @@ class ConnectivityChangeNotifier extends ChangeNotifier {
     resultHandler(connectivityResult);
   }
 
-  @override
-  dispose() {
-    super.dispose();
-
-    sub.cancel();
-  }
 }
